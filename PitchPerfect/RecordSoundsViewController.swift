@@ -30,15 +30,13 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
     }
 
     @IBAction func recordAudio(_ sender: Any) {
-        recordingLabel.text = "Recording in Progress"
-        recordButton.isEnabled = false
-        stopRecordingButton.isEnabled = true
+        setUIState(isRecording: true, recordingText: "Recording in Progress")
         
         let dirPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as String
         let recordingName = "recordedVoice.wav"
         let pathArray = [dirPath, recordingName]
         let filePath = URL(string: pathArray.joined(separator: "/"))
-        print("filePath \(filePath)")
+//        print("filePath \(filePath)")
         
         let session = AVAudioSession.sharedInstance()
         try! session.setCategory(AVAudioSessionCategoryPlayAndRecord, with: .defaultToSpeaker)
@@ -51,12 +49,22 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     @IBAction func stopRecording(_ sender: Any) {
-        recordingLabel.text = "Tap to Record"
-        recordButton.isEnabled = true
-        stopRecordingButton.isEnabled = false
+        setUIState(isRecording: false, recordingText: "Tap to Record")
         audioRecorder.stop()
         let audioSession = AVAudioSession.sharedInstance()
         try! audioSession.setActive(false)
+    }
+    
+    func setUIState(isRecording: Bool, recordingText: String) {
+        recordingLabel.text = recordingText
+        if isRecording == true {
+            recordButton.isEnabled = false
+            stopRecordingButton.isEnabled = true
+        }
+        else {
+            recordButton.isEnabled = true
+            stopRecordingButton.isEnabled = false
+        }
     }
     
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
@@ -65,6 +73,13 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
         }
         else {
             print("recording not successful")
+            let alert = UIAlertController.init(title: "Error", message: "Recording not successful.", preferredStyle: .alert)
+            let alertAction = UIAlertAction.init(title: "Dismiss", style: .default, handler: { (action) in
+            })
+            alert.addAction(alertAction)
+            self.present(alert, animated: true, completion: {
+                
+            })
         }
     }
     
